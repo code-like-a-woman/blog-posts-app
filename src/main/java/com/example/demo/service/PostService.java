@@ -20,25 +20,25 @@ public class PostService {
 	}
 
 	public List<PostDto> getAllPosts() {
-		return repository.findAll().stream().map(PostDto::new).toList();
+		return repository.findAll().stream().map(PostDto::fromEntity).toList();
 	}
 
 	public PostDto getPostById(long id) {
-		return repository.findById(id).map(PostDto::new)
+		return repository.findById(id).map(PostDto::fromEntity)
 				.orElseThrow(() -> new ResourceNotFoundException("Post not found with the id " + id));
 	}
 
 	public PostDto createPost(NewPostDto post) {
-		Post savedPost = repository.save(new Post(post.getTitle(), post.getContent()));
-		return new PostDto(savedPost);
+		Post savedPost = repository.save(new Post(post.title(), post.content()));
+		return PostDto.fromEntity(savedPost);
 	}
 
 	public PostDto updatePost(Long id, UpdatePostDto postDto) {
 		return repository.findById(id).map(postToUpdate -> {
-			postToUpdate.setTitle(postDto.getTitle());
-			postToUpdate.setContent(postDto.getContent());
+			postToUpdate.setTitle(postDto.title());
+			postToUpdate.setContent(postDto.content());
 			return repository.save(postToUpdate);
-		}).map(PostDto::new).orElseThrow(() -> new RuntimeException("Post not found with the id " + id));
+		}).map(PostDto::fromEntity).orElseThrow(() -> new RuntimeException("Post not found with the id " + id));
 	}
 
 	public void delete(Long id) {
