@@ -38,7 +38,7 @@ public class PostService {
 			postToUpdate.setTitle(postDto.title());
 			postToUpdate.setContent(postDto.content());
 			return repository.save(postToUpdate);
-		}).map(PostDto::fromEntity).orElseThrow(() -> new RuntimeException("Post not found with the id " + id));
+		}).map(PostDto::fromEntity).orElseThrow(() -> new ResourceNotFoundException("Post not found with the id " + id));
 	}
 
 	public void delete(Long id) {
