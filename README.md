@@ -30,17 +30,28 @@ git clone https://github.com/mdjc/blog-posts-app.git
 cd blog-posts-app
 ```
 
-### 2️⃣ Build the project
-
+### 2️⃣ Run Locally
 ```sh
 mvn clean install
-```
-
-### 3️⃣ Run the Application
-
-```sh
 mvn spring-boot:run
 ```
+
+### 🐳 Run with Docker
+1. **Build & Run the Container**
+   ```sh
+   mvn clean package
+   docker build -t blog-posts-app .
+   docker run -d -p 8080:8080 --name blog-posts-app blog-posts-app
+   ```
+2. **Stop & Remove Container:**
+   ```sh
+   docker stop blog-posts-app && docker rm blog-posts-app
+   ```
+   
+### Access the API:
+
+`http://localhost:8080/posts`
+
 
 ## 📖 API Documentation
 
