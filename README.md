@@ -12,7 +12,15 @@ A simple **Spring Boot API** for managing blog posts.
 - Java 21
 
 ## 🛠️ Getting Started
-### 1️⃣ Clone the Repository
+### 🔹 Prerequisites
+
+Ensure you have the following installed before proceeding:
+
+- **Java 21**
+- **Apache Maven 3.9.9**
+
+If you want to set up your local environment exactly like mine, follow these steps:\
+🔗 [Building a REST API with Spring Boot in 10 Steps](https://code-like-a-woman.hashnode.dev/building-a-rest-api-with-spring-boot-in-10-steps)
 
 
 ### 1️⃣ Clone the Repository
