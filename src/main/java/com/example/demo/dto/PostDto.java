@@ -18,7 +18,7 @@ public record PostDto(
 		String content, 
 		
 		@Schema(description = "Timestamp when the post was created", example = "2024-03-05T14:30:00")
-		LocalDateTime createAt
+		LocalDateTime createdAt
 	) {
 	public static PostDto fromEntity(Post postEntity) {
 		return new PostDto(postEntity.getId(), postEntity.getTitle(), postEntity.getContent(),
