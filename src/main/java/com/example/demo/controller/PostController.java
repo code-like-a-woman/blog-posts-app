@@ -31,6 +31,11 @@ public class PostController {
   public PostController(PostService service) {
     this.service = service;
   }
+  
+  @GetMapping("/thread-name")
+  public String getThreadName() {
+    return Thread.currentThread().toString();
+  }
 
   @GetMapping
   @Operation(
