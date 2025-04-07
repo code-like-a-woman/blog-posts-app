@@ -44,8 +44,11 @@ The project has basic JWT and security config. You need to set the following env
 ### Set it locally:
 **Linux/macOS:**
 1. Generate a public key:
-``` openssl rand -base64 32
+
+```bash 
+openssl rand -base64 32
 ```
+
 2. Set your environment variables:
 
 ```bash
