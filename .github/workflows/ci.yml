@@ -2,9 +2,9 @@ name: Primer Workflow
 
 on:
  push:
-   branches: [pruebas-worflow]
+   branches: [pruebas-workflow]
  pull_request:
-   branches: [pruebas-worflow]
+   branches: [pruebas-workflow]
 
 jobs:
   hola:
