@@ -1,0 +1,11 @@
+name: Primer Workflow
+
+on: push
+
+jobs:
+  hola:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Decir hola
+        run: echo "¡Hola, mundo! Estoy aprendiendo GitHub Actions"
