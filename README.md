@@ -1,5 +1,7 @@
 # 🚀 Blog Posts API
 
+![CI](https://github.com/mdjc/blog-posts-app/actions/workflows/ci.yml/badge.svg)
+
 A simple **Spring Boot API** for managing blog posts.
 
 ## 📌 Features
