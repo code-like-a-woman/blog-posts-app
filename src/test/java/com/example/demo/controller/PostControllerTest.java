@@ -12,13 +12,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.crypto.SecretKey;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,8 +41,6 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.PostService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 //@WebMvcTest(PostController.class)
 @MockitoBeans({@MockitoBean(types = PostService.class)})
@@ -232,16 +227,5 @@ class PostControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatePostDto)))
         .andExpect(status().isNotFound());
-  }
-  
-  private String generateTestToken(String secret) {
-    SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-
-    return Jwts.builder()
-            .subject(testUsername)
-            .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-            .signWith(key)
-            .compact();
   }
 }
