@@ -12,22 +12,31 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBeans;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import com.example.demo.auth.JwtUtil;
 import com.example.demo.dto.NewPostDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.dto.UpdatePostDto;
@@ -35,9 +44,15 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.PostService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
-@WebMvcTest(PostController.class)
+//@WebMvcTest(PostController.class)
 @MockitoBeans({@MockitoBean(types = PostService.class)})
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles("test") // optional but clean
 class PostControllerTest {
   private static final LocalDateTime fixedCreatedAt = LocalDateTime.of(2024, 5, 21, 4, 30);
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -52,6 +67,22 @@ class PostControllerTest {
   private PostController controller;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
+  
+  @Value("${jwt.secret}")
+  String jwtSecret;
+  
+  @Value("${api.username}")
+  String testUsername;
+  
+  @Autowired
+  private JwtUtil jwtUtil;
+  
+  private String token;
+
+  @BeforeEach
+  void setup() {
+      token = jwtUtil.generateToken(testUsername);
+  }
 
   @Test
   void testGetAllPosts() throws Exception {
@@ -63,7 +94,9 @@ class PostControllerTest {
     when(postService.getAllPosts()).thenReturn(posts);
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/posts").contentType(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get("/api/posts")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk()).andExpect(jsonPath("$.size()").value(posts.size())).andReturn();
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -92,7 +125,9 @@ class PostControllerTest {
     when(postService.getPostById(1L)).thenReturn(post);
 
     ResultActions results = mockMvc.perform(
-        MockMvcRequestBuilders.get("/api/posts/1").contentType(MediaType.APPLICATION_JSON));
+        MockMvcRequestBuilders.get("/api/posts/1")
+        .header("Authorization", "Bearer " + token)
+        .contentType(MediaType.APPLICATION_JSON));
     results.andExpect(status().isOk());
     results.andExpect(jsonPath("$.id").value(post.id()));
     results.andExpect(jsonPath("$.title").value(post.title()));
@@ -106,7 +141,9 @@ class PostControllerTest {
         .thenThrow(new ResourceNotFoundException("Post with ID 99 not found"));
 
     ResultActions results = mockMvc.perform(
-        MockMvcRequestBuilders.get("/api/posts/99").contentType(MediaType.APPLICATION_JSON));
+        MockMvcRequestBuilders.get("/api/posts/99")
+        .header("Authorization", "Bearer " + token)
+        .contentType(MediaType.APPLICATION_JSON));
 
     results.andExpect(status().isNotFound()).andExpect(
         result -> assertTrue(result.getResolvedException() instanceof ResourceNotFoundException))
@@ -122,6 +159,7 @@ class PostControllerTest {
     when(postService.createPost(newPost)).thenReturn(savedPost);
 
     ResultActions results = mockMvc.perform(post("/api/posts")
+        .header("Authorization", "Bearer " + token)
         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(newPost)));
 
     results.andExpect(status().isCreated()).andExpect(jsonPath("$.id").value(savedPost.id()));
@@ -135,7 +173,9 @@ class PostControllerTest {
     Long postId = 1L;
 
     ResultActions result =
-        mockMvc.perform(delete("/api/posts/{id}", postId).contentType(MediaType.APPLICATION_JSON));
+        mockMvc.perform(delete("/api/posts/{id}", postId)
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON));
 
     result.andExpect(status().isNoContent());
     verify(postService, times(1)).delete(postId);
@@ -148,7 +188,9 @@ class PostControllerTest {
         .delete(postId);
 
     ResultActions result =
-        mockMvc.perform(delete("/api/posts/{id}", postId).contentType(MediaType.APPLICATION_JSON));
+        mockMvc.perform(delete("/api/posts/{id}", postId)
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON));
 
     result.andExpect(status().isNotFound())
         .andExpect(r -> assertTrue(r.getResolvedException() instanceof ResourceNotFoundException))
@@ -167,6 +209,7 @@ class PostControllerTest {
 
     mockMvc
         .perform(MockMvcRequestBuilders.put("/api/posts/{id}", postId)
+            .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatePostDto)))
         .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(postId))
@@ -185,8 +228,20 @@ class PostControllerTest {
 
     mockMvc
         .perform(MockMvcRequestBuilders.put("/api/posts/{id}", postId)
+            .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatePostDto)))
         .andExpect(status().isNotFound());
+  }
+  
+  private String generateTestToken(String secret) {
+    SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+
+    return Jwts.builder()
+            .subject(testUsername)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+            .signWith(key)
+            .compact();
   }
 }
