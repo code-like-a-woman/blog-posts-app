@@ -12,6 +12,7 @@ A simple **Spring Boot API** for managing blog posts.
 - Java 21
 - JWT token verification with version 0.12.6
 - Authentication with Spring Security
+- Automated testing pipeline with **GitHub Actions**
 
 ## 🛠️ Getting Started
 ### 🔹 Prerequisites
@@ -61,6 +62,17 @@ export PASSWORD=your-password
 ```sh
 mvn clean install
 mvn spring-boot:run
+```
+
+### 🧪 Running Tests Locally
+
+To run the tests securely with the same environment config:
+
+```bash
+export API_SECRET_KEY=your-secret
+export USERNAME=your-username
+export PASSWORD=your-password
+mvn test
 ```
 
 ### 🐳 Run with Docker
@@ -114,4 +126,7 @@ http://localhost:8080/v3/api-docs
 
 Contributions are welcome! Feel free to **fork the repo**, create a **new branch**, and submit a **pull request**.
 
+## 🔄 Continuous Integration
+
+CI tests run automatically on every push or pull request to the `main` branch via [GitHub Actions](https://github.com/mdjc/blog-posts-app/actions).
 
