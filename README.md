@@ -124,11 +124,10 @@ http://localhost:8080/swagger-ui.html
 http://localhost:8080/v3/api-docs
 ```
 
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to **fork the repo**, create a **new branch**, and submit a **pull request**.
-
 ## 🔄 Continuous Integration
 
 CI tests run automatically on every push or pull request to the `main` branch via [GitHub Actions](https://github.com/mdjc/blog-posts-app/actions).
 
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to **fork the repo**, create a **new branch**, and submit a **pull request**.
