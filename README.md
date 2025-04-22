@@ -15,7 +15,7 @@ A simple **Spring Boot API** for managing blog posts.
 - JWT token verification
 - Authentication with Spring Security
 - Continuous Integration with **GitHub Actions**
-- Production-ready **Docker** setup
+- Optimized **Docker** build process
 
 ---
 
