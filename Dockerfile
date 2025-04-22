@@ -1,14 +1,17 @@
-# Use an official Java 21 runtime as the base image
-FROM eclipse-temurin:21-jdk-alpine
+# Use Maven + Java 21 as the base image
+FROM maven:3.9.4-eclipse-temurin-21-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the built JAR file into the container
-COPY target/blog-posts-app.jar app.jar
+# Copy the entire project content
+COPY . .
+
+# compiles the application
+RUN mvn clean package -DskipTests
 
 # Expose the application port
 EXPOSE 8080
 
 # Run the application
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "target/blog-posts-app.jar"]
