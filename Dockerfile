@@ -22,6 +22,12 @@ FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
+# Create a non-root user
+RUN adduser -D -u 1000 appuser
+
+# 2. Change user to appuser
+USER appuser
+
 COPY --from=build /app/target/blog-posts-app.jar blog-posts-app.jar
 
 # Expose the application port
