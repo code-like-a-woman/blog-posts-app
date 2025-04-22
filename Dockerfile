@@ -5,10 +5,16 @@ FROM maven:3.9.4-eclipse-temurin-21-alpine AS build
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the entire project content
-COPY . .
+# Copy pom.xml to download Maven dependencies
+COPY pom.xml .
 
-# compiles the application
+# Donwload Maven dependencies and cache them
+RUN mvn dependency:go-offline
+
+# Copy source code
+COPY src ./src
+
+# Compile the application
 RUN mvn clean package -DskipTests
 
 # -------- Runtime Stage --------
